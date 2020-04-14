@@ -1,6 +1,6 @@
 <template>
   <span>
-    <img height="350" src="@/assets/assistente.jpeg" alt="Elaine" />
+    <img height="350" src="@/assets/medica.png" alt="Elaine" />
     <h2>{{ msg }}</h2>
     <p>
       <input
@@ -8,6 +8,7 @@
         type="type"
         v-model="usuarioTexto"
         placeholder="O que você quer falar?"
+        id="input"
       />
     </p>
     <button @click="recebeTexto()" class="btn-elaine">Ok</button>
@@ -16,13 +17,13 @@
 </template>
 
 <script>
-
 export default {
   name: "Elaine",
   data() {
     return {
       msg: "Olá, tudo bem?",
-      usuarioTexto: ""
+      usuarioTexto: "",
+      pagina: ""
     };
   },
   methods: {
@@ -36,44 +37,69 @@ export default {
         let p = new URLSearchParams();
         p.append("mensagem", this.usuarioTexto);
         p.append("session_id", this.$session_id);
+
         this.$http.post("api.php", p).then(response => {
           console.log(response);
-          console.log(this.$session_id);
-          this.msg = response.data.output.generic[0].text;
+
+          if (response.data.output.generic[1]) {
+            this.msg = response.data.output.generic[0].text + " " + response.data.output.generic[1].text;
+          }
+          else {
+            this.msg = response.data.output.generic[0].text;
+          }
           this.textoVoz(this.msg);
 
-          for (let item of response.data.output.entities) {
-            if (item.entity == "Pagina") {
-              if (item.value == "ic") {
-                setTimeout(() => {
-                  window.open("http://www.ic.uff.br", "_blank");
-                }, 3000);
-              }
-              if (item.value == "google") {
-                setTimeout(() => {
-                  window.open("https://www.google.com.br", "_blank");
-                }, 3000);
+          if (response.data.context.skills["main skill"].user_defined) {
+            if (response.data.context.skills["main skill"].user_defined.pagina) {
+              this.pagina =
+                response.data.context.skills["main skill"].user_defined.pagina;
+
+              if (this.pagina) {
+                if (this.pagina == "covid19-oms-symptoms") {
+                  setTimeout(() => {
+                    window.open(
+                      "https://www.who.int/health-topics/coronavirus#tab=tab_3",
+                      "_blank"
+                    );
+                  }, 3000);
+                }
+                if (this.pagina == "covid19-oms-prevention") {
+                  setTimeout(() => {
+                    window.open(
+                      "https://www.who.int/health-topics/coronavirus#tab=tab_2",
+                      "_blank"
+                    );
+                  }, 3000);
+                }
+                if (this.pagina == "covid19-oms-overview") {
+                  setTimeout(() => {
+                    window.open(
+                      "https://www.who.int/health-topics/coronavirus#tab=tab_1",
+                      "_blank"
+                    );
+                  }, 3000);
+                }
               }
             }
           }
         });
-        this.usuarioTexto == "";
       }
     },
     textoVoz(msg) {
-      if('speechSynthesis' in window){
+      if ("speechSynthesis" in window) {
         let utterance = new SpeechSynthesisUtterance(msg);
-        utterance.lang = 'pt-BR';
+        utterance.lang = "pt-BR";
         utterance.pitch = 1;
         window.speechSynthesis.speak(utterance);
       }
     },
     vozTexto() {
-      let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       //let SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
       //let SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
       let recognition = new SpeechRecognition();
-      recognition.lang = 'pt-BR';
+      recognition.lang = "pt-BR";
       recognition.maxAlternatives = 1;
       recognition.start();
 

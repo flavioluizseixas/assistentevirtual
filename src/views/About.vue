@@ -1,6 +1,11 @@
 <template>
   <div class="about">
-    <h2>Desenvolvido por Flávio Luiz Seixas</h2>
+    <h3>Desenvolvido por</h3><h3>Flávio Luiz Seixas</h3>
+    <p>Este aplicativo se trata de um protótipo de um Agente Inteligente Conversacional.</p>
+    <p>NÃO deve ser utilizado para propósitos clínicos!</p>
+    <p>
+      <img height="50" src="@/assets/Logo_UFF.png" alt="UFF" />
+    </p>
     <button @click="abresite()" class="btn-elaine">Website</button>
     <p>
       <a href="mailto:fseixas@ic.uff.br?Subject=Chatbot%20App" rel="noopener noreferrer" target="_blank">Contact me</a>
